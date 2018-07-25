@@ -72,18 +72,31 @@ type ModuleWeaver() =
                 printErrors errors
         
         // Load Fast.Fody directly
-        match fsiSession.EvalInteractionNonThrowing(sprintf "#r \"Weavers.dll\"") with
+        match fsiSession.EvalInteractionNonThrowing(sprintf "#r \"Fast.Fody.dll\"") with
         | Choice2Of2 exn, errors ->
             errorf "Cannot load Fast.Fody in interactive: %A." exn
             printErrors errors
         | _ -> ()
-        
+
+        // This is where things get less obvious:
+        //   The loaded scripts have, for some strange reason, a different version of
+        //   Fast.Fody loaded in memory, which makes directly exchanging data impossible.
+        //
+        //   However, they have the same System / Fody / Mono.Cecil assemblies in memory,
+        //   which means that you can pass objects as long as you don't use them with
+        //   their Fast.Fody type. Here, for example, we set '__weaver' to this, but as an
+        //   object. The script will thus use '__weaver' not as a ModuleWeaver (from Fast.Fody),
+        //   but as a BaseModuleWeaver (from FodyHelpers).
+        //
+        //   The last trick here is that you cannot set values through the F# interactive session.
+        //   Thus instead of setting values, we get a reference to a value from the "other side,"
+        //   and then we set it.
         match fsiSession.EvalExpressionNonThrowing("Fast.Fody.Context.__weaver : obj ref") with
         | Choice2Of2 exn, errors ->
             errorf "Cannot initialize context: %A." exn
             printErrors errors
 
-        | Choice1Of2  None, _ ->
+        | Choice1Of2 None, _ ->
             assert false
         
         | Choice1Of2 (Some value), _ ->
