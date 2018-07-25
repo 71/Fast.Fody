@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+
+    <Version>0.1.0</Version>
+    <FileVersion>$(Version).0</FileVersion>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    
+    <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">True</GenerateDocumentationFile>
+    <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">True</GeneratePackageOnBuild>
+
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+    <!-- NuGet properties -->
+    <Description>Fody weaver that removes all references to FSharp.Core in an assembly.</Description>
+    <Copyright>Copyright 2018 (c) Grégoire Geis</Copyright>
+    <Authors>Grégoire Geis</Authors>
+
+    <Title>Fast</Title>
+    <PackageId>Fast.Fody</PackageId>
+    <PackageVersion>$(Version)</PackageVersion>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>- Initial release.</PackageReleaseNotes>
+    <PackageTags>fody weaver fsharp</PackageTags>
+
+    <PackageProjectUrl>https://github.com/6A/Fast.Fody</PackageProjectUrl>
+    <PackageLicenseUrl>$(PackageProjectUrl)/blob/master/LICENSE.md</PackageLicenseUrl>
+
+    <RepositoryUrl>$(PackageProjectUrl).git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <!-- Play nice with Fody -->
+    <ItemGroup>
+      <OutputDllFiles Include="$(TargetDir)*.dll" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(OutputDllFiles)" DestinationFolder="$(ProjectDir)..\Weavers\bin" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(ProjectDir)..\Weavers\bin\Weavers.dll" />
+  </Target>
+
+  <ItemGroup>
+    <Compile Include="ModuleWeaver.fs" />
+    <Compile Include="Context.fs" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(DebuggingWeaver)' == 'True' ">
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+  
+  <ItemGroup Condition=" '$(DebuggingWeaver)' == 'True' ">
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FodyHelpers" Version="3.0.3" />
+    <PackageReference Include="FSharp.Compiler.Service" Version="23.0.3" />
+  </ItemGroup>
+
+</Project>
