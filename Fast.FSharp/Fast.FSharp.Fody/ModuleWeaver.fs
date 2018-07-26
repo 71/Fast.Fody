@@ -11,7 +11,7 @@ open Microsoft.FSharp.Compiler.Interactive.Shell
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 
-/// Weaver that will purge all FSharp.Core-related members from the visited module.
+/// Weaver that runs F# scripts given in the Fast.FSharp weaver config.
 type ModuleWeaver() =
     inherit BaseModuleWeaver()
 

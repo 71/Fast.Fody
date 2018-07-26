@@ -14,42 +14,7 @@ open Mono.Cecil
 open Mono.Cecil.Cil
 
 
-type Resolver(weaver: BaseModuleWeaver, fallback: ScriptMetadataResolver) =
-    inherit MetadataReferenceResolver()
-
-    let knownAssemblies =
-        AppDomain.CurrentDomain.GetAssemblies()
-        |> Array.where (fun x -> not x.IsDynamic && not <| String.IsNullOrWhiteSpace x.Location)
-        |> Array.map   (fun x -> x.Location)
-
-        |> Array.append [| weaver.AssemblyFilePath |]
-        |> Array.distinct
-
-
-    override this.Equals(other) =
-        match other with
-        | :? Resolver as other -> LanguagePrimitives.PhysicalEquality this other
-        | _ -> false
-
-    override this.GetHashCode() = LanguagePrimitives.PhysicalHash this
-
-    override __.ResolveMissingAssemblies = true
-    override __.ResolveMissingAssembly(definition, referenceIdentity) =
-        knownAssemblies
-        |> Seq.tryFind (fun x -> Path.GetFileNameWithoutExtension(x) = referenceIdentity.Name)
-        |> function
-           | Some reference -> PortableExecutableReference.CreateFromFile reference
-           | None -> fallback.ResolveMissingAssembly(definition, referenceIdentity)
-
-    override __.ResolveReference(reference, baseFilePath, properties) =
-        knownAssemblies
-        |> Seq.where (fun x -> Path.GetFileName(x).Contains(reference))
-        |> Seq.map   (PortableExecutableReference.CreateFromFile)
-        |> fallback.ResolveReference(reference, baseFilePath, properties)
-                   .AddRange
-
-
-/// Weaver that will purge all FSharp.Core-related members from the visited module.
+/// Weaver that runs C# scripts given in the Fast.CSharp weaver config.
 type ModuleWeaver() =
     inherit BaseModuleWeaver()
 
