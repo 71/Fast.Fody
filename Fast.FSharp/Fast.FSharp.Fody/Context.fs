@@ -16,13 +16,13 @@ module Observe =
     let internal processEvent    = new Event<EventDefinition>()
     let internal processProperty = new Event<PropertyDefinition>()
 
-    let Assembly = processAssembly.Publish :> IObservable<_>
-    let Module   = processModule.Publish   :> IObservable<_>
-    let Type     = processType.Publish     :> IObservable<_>
-    let Method   = processMethod.Publish   :> IObservable<_>
-    let Field    = processField.Publish    :> IObservable<_>
-    let Property = processProperty.Publish :> IObservable<_>
-    let Event    = processEvent.Publish    :> IObservable<_>
+    let Assemblies = processAssembly.Publish :> IObservable<_>
+    let Modules    = processModule.Publish   :> IObservable<_>
+    let Types      = processType.Publish     :> IObservable<_>
+    let Methods    = processMethod.Publish   :> IObservable<_>
+    let Fields     = processField.Publish    :> IObservable<_>
+    let Properties = processProperty.Publish :> IObservable<_>
+    let Events     = processEvent.Publish    :> IObservable<_>
 
 
 [<AutoOpen>]

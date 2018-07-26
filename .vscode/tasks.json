@@ -4,10 +4,10 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "build",
+      "label": "build-all",
       "command": "dotnet build",
       "options": {
-        "cwd": "${workspaceRoot}/Fast.Fody"
+        "cwd": "${workspaceRoot}"
       },
       "type": "shell",
       "group": "build",
@@ -17,10 +17,23 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "build-debug",
+      "label": "build-debug-cs",
       "command": "dotnet build /p:DebuggingWeaver=True",
       "options": {
-        "cwd": "${workspaceRoot}/Fast.TestAssembly"
+        "cwd": "${workspaceRoot}/Fast.CSharp/Fash.CSharp.TestAssembly"
+      },
+      "type": "shell",
+      "group": "build",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build-debug-fs",
+      "command": "dotnet build /p:DebuggingWeaver=True",
+      "options": {
+        "cwd": "${workspaceRoot}/Fast.FSharp/Fast.FSharp.TestAssembly"
       },
       "type": "shell",
       "group": "build",

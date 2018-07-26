@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project>
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,8 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Tests.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tests\Tests.fs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tests\Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\$(BaseProjectName).TestAssembly\$(BaseProjectName).TestAssembly.fsproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,10 +19,6 @@
     <PackageReference Include="Nunit" Version="3.10.1" />
     <PackageReference Include="Nunit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="Unquote" Version="4.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Fast.TestAssembly\Fast.TestAssembly.fsproj" />
   </ItemGroup>
 
 </Project>

@@ -2,11 +2,23 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Fast.CSharp.Fody",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-debug-cs",
+      "program": "${workspaceFolder}/Fast.CSharp/Fash.CSharp.Fody/bin/Debug/netcoreapp2.0/Fast.CSharp.Fody.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
       "name": "Launch Fast.Fody",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-debug",
-      "program": "${workspaceFolder}/Fast.Fody/bin/Debug/netcoreapp2.0/Fast.Fody.dll",
+      "preLaunchTask": "build-debug-fs",
+      "program": "${workspaceFolder}/Fast.FSharp/Fast.FSharp.Fody/bin/Debug/netcoreapp2.0/Fast.FSharp.Fody.dll",
       "args": [],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",

@@ -1,7 +1,7 @@
 #if INTERACTIVE
 // Necessary to get completions:
-#r @"..\..\Fast.Fody\bin\Debug\netstandard2.0\Mono.Cecil.dll"
-#r @"..\..\Fast.Fody\bin\Debug\netstandard2.0\Fast.Fody.dll"
+#r @"..\..\Fast.FSharp.Fody\bin\Debug\netstandard2.0\Mono.Cecil.dll"
+#r @"..\..\Fast.FSharp.Fody\bin\Debug\netstandard2.0\Fast.Fody.dll"
 #else
 // Necessary for the script to load correctly:
 #r "Mono.Cecil.dll"
@@ -12,7 +12,8 @@ open Mono.Cecil.Cil
 
 open Fast.Fody
 
-debugf "Starting replacement..."
+// Warn to ensure we can see the message
+warnf "Starting replacement..."
 
 Observe.Property
 |> Observable.filter (fun x -> x.Name = "answer")
@@ -21,7 +22,7 @@ Observe.Property
 
     let newBody = MethodBody(prop.GetMethod)
 
-    newBody.Instructions.Add(Instruction.Create(OpCodes.Ldstr, "Forty-two."))
+    newBody.Instructions.Add(Instruction.Create(OpCodes.Ldc_I4, 42))
     newBody.Instructions.Add(Instruction.Create(OpCodes.Ret))
 
     prop.GetMethod.Body <- newBody

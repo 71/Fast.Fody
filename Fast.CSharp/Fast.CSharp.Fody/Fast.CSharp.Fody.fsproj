@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\Fast.CSharp.props" />
+  <Import Project="..\..\Common\Fody.props" />
+
+  <PropertyGroup>
+    <Description>Fody weaver that uses C# scripts to dynamically edit an assembly.</Description>
+    <PackageTags>$(PackageTags), csharp, interactive, script</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="ModuleWeaver.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.8.2" />
+    <PackageReference Include="System.Reactive.Linq" Version="4.0.0" />
+  </ItemGroup>
+
+</Project>

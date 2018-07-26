@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project>
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -13,17 +13,20 @@
     <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
     <DisableFody>True</DisableFody>
 
+    <SignAssembly>True</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">True</PublicSign>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Fast.Fody.snk</AssemblyOriginatorKeyFile>
+
     <!-- NuGet properties -->
-    <Description>Fody weaver that uses F# scripts to dynamically edit an assembly.</Description>
     <Copyright>Copyright 2018 (c) Grégoire Geis</Copyright>
     <Authors>Grégoire Geis</Authors>
 
-    <Title>Fast.Fody</Title>
-    <PackageId>Fast.Fody</PackageId>
+    <Title>$(BaseProjectName).Fody</Title>
+    <PackageId>$(BaseProjectName).Fody</PackageId>
     <PackageVersion>$(Version)</PackageVersion>
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>- Initial release.</PackageReleaseNotes>
-    <PackageTags>fody weaver fsharp interactive fsi</PackageTags>
+    <PackageTags>fody, weaver</PackageTags>
 
     <PackageProjectUrl>https://github.com/6A/Fast.Fody</PackageProjectUrl>
     <PackageLicenseUrl>$(PackageProjectUrl)/blob/master/LICENSE.md</PackageLicenseUrl>
@@ -45,17 +48,12 @@
   <Target Name="CollectRuntimeOutputs" BeforeTargets="_GetPackageFiles">
     <!-- Collect these items inside a target that runs after build but before packaging. -->
     <ItemGroup>
-      <Content Include="$(OutputPath)*.dll;$(OutputPath)*.xml;$(OutputPath)Fast.Fody.pdb">
+      <Content Include="$(OutputPath)*.dll;$(OutputPath)*.xml;$(OutputPath)$(BaseProjectName).Fody.pdb">
         <Pack>true</Pack>
         <PackagePath />
       </Content>
     </ItemGroup>
   </Target>
-
-  <ItemGroup>
-    <Compile Include="ModuleWeaver.fs" />
-    <Compile Include="Context.fs" />
-  </ItemGroup>
 
   <PropertyGroup Condition=" '$(DebuggingWeaver)' == 'True' ">
     <OutputType>Exe</OutputType>
@@ -63,13 +61,12 @@
   </PropertyGroup>
   
   <ItemGroup Condition=" '$(DebuggingWeaver)' == 'True' ">
-    <Compile Include="Program.fs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FodyDebugProgram.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Fody" Version="3.1.2" PrivateAssets="None" />
     <PackageReference Include="FodyHelpers" Version="3.1.2" />
-    <PackageReference Include="FSharp.Compiler.Service" Version="23.0.3" />
   </ItemGroup>
 
 </Project>
