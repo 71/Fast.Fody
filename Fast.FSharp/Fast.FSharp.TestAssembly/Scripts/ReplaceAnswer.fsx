@@ -1,21 +1,19 @@
-#if INTERACTIVE
-// Necessary to get completions:
-#r @"..\..\Fast.FSharp.Fody\bin\Debug\netstandard2.0\Mono.Cecil.dll"
-#r @"..\..\Fast.FSharp.Fody\bin\Debug\netstandard2.0\Fast.Fody.dll"
-#else
+#if FAST
 // Necessary for the script to load correctly:
 #r "Mono.Cecil.dll"
-#r "Fast.Fody.dll"
+#r "Fast.FSharp.Fody.dll"
+#else
+// Necessary to get completions:
+#r @"..\..\Fast.FSharp.Fody\bin\Debug\netstandard2.0\Mono.Cecil.dll"
+#r @"..\..\Fast.FSharp.Fody\bin\Debug\netstandard2.0\Fast.FSharp.Fody.dll"
 #endif
 
 open Mono.Cecil.Cil
 
-open Fast.Fody
-
 // Warn to ensure we can see the message
 warnf "Starting replacement..."
 
-Observe.Property
+Observe.Properties
 |> Observable.filter (fun x -> x.Name = "answer")
 |> Observable.add(fun prop ->
     debugf "Found property to edit in %s, processing..." prop.DeclaringType.FullName

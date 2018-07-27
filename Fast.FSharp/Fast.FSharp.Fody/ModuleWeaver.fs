@@ -34,7 +34,7 @@ type ModuleWeaver() =
         use err = new StringWriter(errString)
         use in' = new StringReader("")
 
-        let args = [| "fsi"; "--noninteractive"; "--nologo" |]
+        let args = [| "fsi"; "--noninteractive"; "--nologo"; "--define:FAST" |]
 
         let fsiConfig  = FsiEvaluationSession.GetDefaultConfiguration()
         let fsiSession = FsiEvaluationSession.Create(fsiConfig, args, in', out, err)
@@ -72,7 +72,7 @@ type ModuleWeaver() =
                 printErrors errors
         
         // Load Fast.Fody directly
-        match fsiSession.EvalInteractionNonThrowing(sprintf "#r \"Fast.Fody.dll\"") with
+        match fsiSession.EvalInteractionNonThrowing(sprintf "#r \"Fast.FSharp.Fody.dll\"") with
         | Choice2Of2 exn, errors ->
             errorf "Cannot load Fast.Fody in interactive: %A." exn
             printErrors errors
@@ -91,7 +91,7 @@ type ModuleWeaver() =
         //   The last trick here is that you cannot set values through the F# interactive session.
         //   Thus instead of setting values, we get a reference to a value from the "other side,"
         //   and then we set it.
-        match fsiSession.EvalExpressionNonThrowing("Fast.Fody.Context.__weaver : obj ref") with
+        match fsiSession.EvalExpressionNonThrowing("Context.__weaver : obj ref") with
         | Choice2Of2 exn, errors ->
             errorf "Cannot initialize context: %A." exn
             printErrors errors
@@ -102,7 +102,7 @@ type ModuleWeaver() =
         | Choice1Of2 (Some value), _ ->
             (value.ReflectionValue :?> obj ref) := box this
 
-            fsiSession.EvalInteraction("Fast.Fody.Context.__initialize() ;;")
+            fsiSession.EvalInteraction("Context.__initialize() ;;")
 
             // Execute scripts (lets them add various handlers)
             let baseDirectory = this.ProjectDirectoryPath
@@ -136,4 +136,4 @@ type ModuleWeaver() =
 
             // Process assembly
             if success then
-                fsiSession.EvalInteraction("Fast.Fody.Context.__process() ;;")
+                fsiSession.EvalInteraction("Context.__process() ;;")

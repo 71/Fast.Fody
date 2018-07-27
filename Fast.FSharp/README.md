@@ -29,19 +29,17 @@ Here, we'll create a script that replaces the body of all properties named `answ
 
 #### Create the `ReplaceAnswer.fsx` script that modifies your assembly:
 ```fs
-#if INTERACTIVE
+#if FAST
+// Necessary for the script to load correctly:
+#r "Mono.Cecil.dll"
+#r "Fast.FSharp.Fody.dll"
+#else
 // Necessary to get completions:
 #r @"..\Path\To\Mono.Cecil.dll"
 #r @"..\Path\To\Fast.Fody.dll"
-#else
-// Necessary for the script to load correctly:
-#r "Mono.Cecil.dll"
-#r "Fast.Fody.dll"
 #endif
 
 open Mono.Cecil.Cil
-
-open Fast.Fody
 
 //      Find all properties...
 Observe.Properties
@@ -74,19 +72,19 @@ Yup, just let Fody do the rest.
 The following API is provided from the scripts.
 
 ```fs
+[<AutoOpen>]
 module Context =
-  // This module is open by default.
   val debugf : StringFormat<'args, unit> -> 'args
   val warnf  : StringFormat<'args, unit> -> 'args
   val errorf : StringFormat<'args, unit> -> 'args
   val infof  : StringFormat<'args, unit> -> 'args
 
-module Observe =
-  val Assemblies : IObservable<AssemblyDefinition>
-  val Modules    : IObservable<ModuleDefinition>
-  val Types      : IObservable<TypeDefinition>
-  val Methods    : IObservable<MethodDefinition>
-  val Properties : IObservable<PropertyDefinition>
-  val Fields     : IObservable<FieldDefinition>
-  val Events     : IObservable<EventDefinition>
+  module Observe =
+    val Assemblies : IObservable<AssemblyDefinition>
+    val Modules    : IObservable<ModuleDefinition>
+    val Types      : IObservable<TypeDefinition>
+    val Methods    : IObservable<MethodDefinition>
+    val Properties : IObservable<PropertyDefinition>
+    val Fields     : IObservable<FieldDefinition>
+    val Events     : IObservable<EventDefinition>
 ```
