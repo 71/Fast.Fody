@@ -12,8 +12,6 @@ open Microsoft.CodeAnalysis.CSharp.Scripting
 
 open Mono.Cecil
 open Mono.Cecil.Cil
-open Microsoft.CodeAnalysis
-open Microsoft.CodeAnalysis.Scripting
 
 
 /// Weaver that runs C# scripts given in the Fast.CSharp weaver config.
