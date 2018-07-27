@@ -1,3 +1,4 @@
+#load "../../Fast.CSharp.Fody/Context.csx"
 
 Context.Warn("Starting replacement...");
 

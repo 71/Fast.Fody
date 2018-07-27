@@ -12,6 +12,8 @@ open Microsoft.CodeAnalysis.CSharp.Scripting
 
 open Mono.Cecil
 open Mono.Cecil.Cil
+open Microsoft.CodeAnalysis
+open Microsoft.CodeAnalysis.Scripting
 
 
 /// Weaver that runs C# scripts given in the Fast.CSharp weaver config.
@@ -54,13 +56,14 @@ type ModuleWeaver() =
                                 |> not
                             )
         
-        let scriptResolver = ScriptMetadataResolver.Default
-                                .WithSearchPaths(knownAssemblies
-                                                 |> Seq.map Path.GetDirectoryName
-                                                 |> Seq.distinct
-                                                 |> Seq.toArray)
-        
-        let resolver = { new MetadataReferenceResolver() with
+        let scriptMetadataResolver =
+            ScriptMetadataResolver.Default
+                .WithSearchPaths(knownAssemblies
+                                 |> Seq.map Path.GetDirectoryName
+                                 |> Seq.distinct
+                                 |> Seq.toArray)
+    
+        let metadataResolver = { new MetadataReferenceResolver() with
             override this.Equals(other) =
                 LanguagePrimitives.PhysicalEquality (box this) other
 
@@ -73,22 +76,50 @@ type ModuleWeaver() =
                 |> Seq.tryFind (fun x -> Path.GetFileNameWithoutExtension(x) = referenceIdentity.Name)
                 |> function
                    | Some reference -> PortableExecutableReference.CreateFromFile reference
-                   | None -> scriptResolver.ResolveMissingAssembly(definition, referenceIdentity)
+                   | None -> scriptMetadataResolver.ResolveMissingAssembly(definition, referenceIdentity)
 
             override __.ResolveReference(reference, baseFilePath, properties) =
                 knownAssemblies
                 |> Seq.where (fun x -> Path.GetFileName(x).Contains(reference))
                 |> Seq.map   (PortableExecutableReference.CreateFromFile)
-                |> scriptResolver.ResolveReference(reference, baseFilePath, properties)
+                |> scriptMetadataResolver.ResolveReference(reference, baseFilePath, properties)
                                 .AddRange
         }
+
+        let scriptSourceResolver =
+            ScriptSourceResolver.Default
+                .WithBaseDirectory(this.ProjectDirectoryPath)
         
+        use emptyStream = new MemoryStream(0)
+
+        let sourceResolver = { new SourceReferenceResolver() with
+            override __.Equals(other) =
+                LanguagePrimitives.PhysicalEquality (box this) other
+
+            override this.GetHashCode() =
+                LanguagePrimitives.PhysicalHash this
+
+            override __.NormalizePath(path, baseFilePath) =
+                scriptSourceResolver.NormalizePath(path, baseFilePath)
+
+            override __.ResolveReference(path, baseFilePath) =
+                scriptSourceResolver.ResolveReference(path, baseFilePath)
+
+            override __.OpenRead(resolvedPath) =
+                if Path.GetFileName(resolvedPath) = "Context.csx" then
+                    // Do not provide a source to Context.csx, since we have our own shim below
+                    emptyStream :> _
+                else
+                    scriptSourceResolver.OpenRead(resolvedPath)
+        }
+
         let runtime = typeof<obj>.Assembly.Location
                       |> Path.GetDirectoryName
                       |> fun root -> Path.Combine(root, "System.Runtime.dll")
 
         let baseScriptOpts = ScriptOptions.Default
-                                .WithMetadataResolver(resolver)
+                                .WithMetadataResolver(metadataResolver)
+                                .WithSourceResolver(sourceResolver)
                                 .AddReferences(knownAssemblies)
                                 .AddReferences(typeof<obj>.Assembly,
                                                typeof<ModuleDefinition>.Assembly,
@@ -207,7 +238,7 @@ type ModuleWeaver() =
                                     Path.Combine(baseDirectory, scriptPath)
 
             let scriptOpts    = baseScriptOpts.WithFilePath(fullScriptPath)
-            let scriptContent = File.ReadAllText(fullScriptPath)
+            use scriptContent = File.OpenRead(fullScriptPath)
 
             let script = state.Script.ContinueWith(scriptContent, scriptOpts)
 
