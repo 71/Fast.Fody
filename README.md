@@ -1,5 +1,5 @@
-Fast.Fody
-=========
+Fast.[Fody](https://github.com/Fody/Fody)
+=========================================
 
 Weave an assembly using .NET scripts, for extra productivity.
 

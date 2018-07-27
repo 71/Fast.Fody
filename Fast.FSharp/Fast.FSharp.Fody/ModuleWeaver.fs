@@ -1,4 +1,4 @@
-namespace Fast.Fody
+namespace Fast.FSharp.Fody
 
 open System
 open System.IO
@@ -71,21 +71,21 @@ type ModuleWeaver() =
                 errorf "Cannot import directory '%s': %A." assemblyDirectory exn 
                 printErrors errors
         
-        // Load Fast.Fody directly
+        // Load Fast.FSharp.Fody directly
         match fsiSession.EvalInteractionNonThrowing(sprintf "#r \"Fast.FSharp.Fody.dll\"") with
         | Choice2Of2 exn, errors ->
-            errorf "Cannot load Fast.Fody in interactive: %A." exn
+            errorf "Cannot load Fast.FSharp.Fody in interactive: %A." exn
             printErrors errors
         | _ -> ()
 
         // This is where things get less obvious:
         //   The loaded scripts have, for some strange reason, a different version of
-        //   Fast.Fody loaded in memory, which makes directly exchanging data impossible.
+        //   Fast.FSharp.Fody loaded in memory, which makes directly exchanging data impossible.
         //
         //   However, they have the same System / Fody / Mono.Cecil assemblies in memory,
         //   which means that you can pass objects as long as you don't use them with
-        //   their Fast.Fody type. Here, for example, we set '__weaver' to this, but as an
-        //   object. The script will thus use '__weaver' not as a ModuleWeaver (from Fast.Fody),
+        //   their Fast.FSharp.Fody type. Here, for example, we set '__weaver' to this, but as an
+        //   object. The script will thus use '__weaver' not as a ModuleWeaver (from Fast.FSharp.Fody),
         //   but as a BaseModuleWeaver (from FodyHelpers).
         //
         //   The last trick here is that you cannot set values through the F# interactive session.

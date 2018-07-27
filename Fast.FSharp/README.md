@@ -36,7 +36,7 @@ Here, we'll create a script that replaces the body of all properties named `answ
 #else
 // Necessary to get completions:
 #r @"..\Path\To\Mono.Cecil.dll"
-#r @"..\Path\To\Fast.Fody.dll"
+#r @"..\Path\To\Fast.FSharp.Fody.dll"
 #endif
 
 open Mono.Cecil.Cil

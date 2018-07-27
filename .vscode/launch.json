@@ -14,7 +14,7 @@
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
-      "name": "Launch Fast.Fody",
+      "name": "Launch Fast.FSharp.Fody",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build-debug-fs",
