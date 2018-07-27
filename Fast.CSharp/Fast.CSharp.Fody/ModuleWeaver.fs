@@ -1,4 +1,4 @@
-namespace Fast.CShar.Fody
+namespace Fast.CSharp.Fody
 
 open System
 open System.IO
